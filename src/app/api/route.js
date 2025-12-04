@@ -1,5 +1,3 @@
-const https = require('https');
-
 const ADDRESS_API_URL = 'https://app.yasno.ua/api/blackout-service/public/shutdowns/addresses/v2/group';
 const OUTAGES_API_URL = 'https://app.yasno.ua/api/blackout-service/public/shutdowns/regions/25/dsos/902/planned-outages';
 
@@ -7,14 +5,6 @@ export async function GET(req) {
     const url = new URL(req.url);
     const streetId = url.searchParams.get('streetId');
     const houseId = url.searchParams.get('houseId');
-
-    const fetchJson = (url) => new Promise((resolve, reject) => {
-        https.get(url, (res) => {
-            let data = '';
-            res.on('data', chunk => data += chunk);
-            res.on('end', () => resolve(JSON.parse(data)));
-        }).on('error', reject);
-    });
 
     const params = new URLSearchParams({
         regionId: '25',
@@ -24,8 +14,8 @@ export async function GET(req) {
     });
 
     const [groupData, outagesData] = await Promise.all([
-        fetchJson(`${ADDRESS_API_URL}?${params}`),
-        fetchJson(OUTAGES_API_URL)
+        fetch(`${ADDRESS_API_URL}?${params}`).then(res => res.json()),
+        fetch(OUTAGES_API_URL).then(res => res.json())
     ]);
 
     const groupSubgroup = `${groupData.group}.${groupData.subgroup}`;
