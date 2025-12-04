@@ -2,4 +2,6 @@ This ia a helper endpoint to get outages for a specific street and house in Kyiv
 
 Example usage:
 
-https://yasno.vercel.app/api?streetId=2&houseId=3
+https://yasno.vercel.app/api?house=2&street=вул. Богомольця Академіка
+
+Note that house letters must be cyrillic letters.

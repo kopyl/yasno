@@ -1,5 +1,10 @@
+const STREETS_API_URL = 'https://app.yasno.ua/api/blackout-service/public/shutdowns/addresses/v2/streets';
+const HOUSES_API_URL = 'https://app.yasno.ua/api/blackout-service/public/shutdowns/addresses/v2/houses';
 const ADDRESS_API_URL = 'https://app.yasno.ua/api/blackout-service/public/shutdowns/addresses/v2/group';
 const OUTAGES_API_URL = 'https://app.yasno.ua/api/blackout-service/public/shutdowns/regions/25/dsos/902/planned-outages';
+
+const REGION_ID = '25';
+const DSO_ID = '902';
 
 const formatTime = (minutes) => {
     const h = String(Math.floor(minutes / 60)).padStart(2, '0');
@@ -9,14 +14,34 @@ const formatTime = (minutes) => {
 
 export async function GET(req) {
     const url = new URL(req.url);
-    const streetId = url.searchParams.get('streetId');
-    const houseId = url.searchParams.get('houseId');
+    const streetName = url.searchParams.get('street');
+    const houseName = url.searchParams.get('house');
+
+    const streetsParams = new URLSearchParams({
+        regionId: REGION_ID,
+        dsoId: DSO_ID,
+        query: streetName,
+    });
+    const streetsResponse = await fetch(`${STREETS_API_URL}?${streetsParams}`);
+    const streets = await streetsResponse.json();
+    const street = streets[0];
+    const streetId = street.id;
+
+    const housesParams = new URLSearchParams({
+        regionId: REGION_ID,
+        dsoId: DSO_ID,
+        streetId: streetId,
+    });
+    const housesResponse = await fetch(`${HOUSES_API_URL}?${housesParams}`);
+    const houses = await housesResponse.json();
+    const house = houses.find(h => h.value === houseName);
+    const houseId = house.id;
 
     const params = new URLSearchParams({
-        regionId: '25',
+        regionId: REGION_ID,
         streetId: streetId,
         houseId: houseId,
-        dsoId: '902',
+        dsoId: DSO_ID,
     });
 
     const [groupData, outagesData] = await Promise.all([
