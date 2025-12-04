@@ -24,6 +24,9 @@ export async function GET(req) {
     });
     const streetsResponse = await fetch(`${STREETS_API_URL}?${streetsParams}`);
     const streets = await streetsResponse.json();
+    if (streets.length === 0) {
+        return Response.json({ error: `Street '${streetName}' not found` }, { status: 404 });
+    }
     const street = streets[0];
     const streetId = street.id;
 
@@ -35,6 +38,9 @@ export async function GET(req) {
     const housesResponse = await fetch(`${HOUSES_API_URL}?${housesParams}`);
     const houses = await housesResponse.json();
     const house = houses.find(h => h.value === houseName);
+    if (!house) {
+        return Response.json({ error: `House '${houseName}' not found` }, { status: 404 });
+    }
     const houseId = house.id;
 
     const params = new URLSearchParams({
