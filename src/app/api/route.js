@@ -41,5 +41,6 @@ export async function GET(req) {
             return [formatTime(o.start), formatTime(o.end)];
         });
 
-    return Response.json(outages);
+    const formattedOutages = outages.map(([start, end]) => `${start} - ${end}`);
+    return Response.json(formattedOutages);
 }
