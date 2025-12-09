@@ -55,7 +55,12 @@ export async function GET(req) {
         fetch(OUTAGES_API_URL).then(res => res.json())
     ]);
 
-    const outages = outagesData[`${groupData.group}.${groupData.subgroup}`].today.slots
+    const today = outagesData[`${groupData.group}.${groupData.subgroup}`].today
+    if (today.status == 'EmergencyShutdowns') {
+        return Response.json('🚨 Emergency outages', { status: 200 });
+    }
+
+    const outages = today.slots
         .filter(o => o.type === 'Definite')
         .map(o => `${formatTime(o.start)} - ${formatTime(o.end)}`);
 
